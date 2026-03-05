@@ -14,6 +14,7 @@
 #   BS_DEVICE      Target device (default: "Google Pixel 7-13.0")
 #   BS_PROJECT     Project name on BrowserStack dashboard (default: "BrowserMaestroTesting")
 #   SKIP_BUILD     Set to "true" to skip ./gradlew assembleDebug
+#   VERBOSE        Set to "true" to print raw API responses for debugging
 # =============================================================================
 set -euo pipefail
 
@@ -38,6 +39,7 @@ BS_BASE_URL="https://api-cloud.browserstack.com"
 BS_DEVICE="${BS_DEVICE:-Google Pixel 7-13.0}"
 BS_PROJECT="${BS_PROJECT:-BrowserMaestroTesting}"
 SKIP_BUILD="${SKIP_BUILD:-false}"
+VERBOSE="${VERBOSE:-false}"
 POLL_INTERVAL=15  # seconds between status checks
 
 # Flows to execute (paths relative to the parent folder inside the zip)
@@ -115,7 +117,8 @@ cp "${MAESTRO_DIR}"/*.yaml "${PARENT_FOLDER}/"
 ZIP_PATH="${TMPDIR_TS}/maestro_tests.zip"
 (cd "${TMPDIR_TS}" && zip -r "${ZIP_PATH}" flows/ -x "*.DS_Store" >/dev/null)
 
-log "Test suite zip: ${ZIP_PATH}"
+log "Zip contents:"
+unzip -l "${ZIP_PATH}" | grep "\.yaml" | awk '{print "  " $NF}'
 log "Uploading test suite ..."
 
 SUITE_RESPONSE=$(curl --silent --fail \
@@ -149,18 +152,19 @@ BUILD_PAYLOAD=$(jq -n \
         project:          $project,
         devices:          [$device],
         execute:          $execute,
-        deviceLogs:       true,
-        networkLogs:      true,
+        deviceLogs:       "true",
+        networkLogs:      "true",
         debugscreenshots: true
     }')
 
 log "Payload: $(echo "${BUILD_PAYLOAD}" | jq -c .)"
 
-BUILD_RESPONSE=$(curl --silent --fail \
+BUILD_RESPONSE=$(curl --silent \
     -u "${BS_AUTH}" \
     -X POST "${BS_BASE_URL}/app-automate/maestro/v2/android/build" \
     -H "Content-Type: application/json" \
-    -d "${BUILD_PAYLOAD}") || die "Build execution request failed."
+    -d "${BUILD_PAYLOAD}")
+[[ $VERBOSE == "true" ]] && warn "Raw build response: ${BUILD_RESPONSE}"
 
 BUILD_ID=$(echo "${BUILD_RESPONSE}" | jq -r '.build_id // empty')
 [[ -n "${BUILD_ID}" ]] || die "Failed to start build. Response:\n${BUILD_RESPONSE}"
@@ -238,6 +242,16 @@ echo "${STATUS_RESPONSE}" | jq -r '
         "failed=\(.testcases.status.failed // 0)  " +
         "skipped=\(.testcases.status.skipped // 0)")
 ' 2>/dev/null || true
+
+# On failure, dump the full raw status response to help diagnose the root cause
+if [[ "${FINAL_STATUS}" != "passed" ]]; then
+    echo ""
+    echo -e "${YELLOW}── Full build status (for debugging) ──────────────────${RESET}"
+    echo "${STATUS_RESPONSE}" | jq . 2>/dev/null || echo "${STATUS_RESPONSE}"
+    echo -e "${YELLOW}────────────────────────────────────────────────────────${RESET}"
+    echo ""
+    echo -e "${YELLOW}Tip: run with VERBOSE=true ./run_browserstack.sh for raw API responses${RESET}"
+fi
 
 echo ""
 [[ "${FINAL_STATUS}" == "passed" ]] && exit 0 || exit 1
