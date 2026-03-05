@@ -1,0 +1,16 @@
+# Build outputs
+/build/
+app/build/
+*.apk
+*.aab
+
+# Android local config
+local.properties
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Gradle caches
+.gradle/
