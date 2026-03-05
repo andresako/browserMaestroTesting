@@ -50,7 +50,11 @@ fun MainScreen() {
         Button(
             onClick = {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wikipedia.org"))
-                context.startActivity(intent)
+                try {
+                    context.startActivity(intent)
+                } catch (e: android.content.ActivityNotFoundException) {
+                    android.util.Log.e("MainActivity", "No browser app found to open URL", e)
+                }
             },
             modifier = Modifier.testTag("open_browser_btn")
         ) {
