@@ -1,0 +1,7 @@
+appId: com.example.browsermaestrotesting
+---
+- launchApp
+- assertVisible:
+    text: "Browser Test App"
+- assertVisible:
+    text: "Open Wikipedia"
