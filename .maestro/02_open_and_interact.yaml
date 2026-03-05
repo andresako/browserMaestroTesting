@@ -1,0 +1,33 @@
+appId: com.example.browsermaestrotesting
+---
+# 1. Launch the dummy app
+- launchApp
+
+# 2. Tap the button that fires the external browser Intent
+- tapOn:
+    text: "Open Wikipedia"
+
+# 3. Wait for browser animation / context switch
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# 4. Assert Wikipedia loaded in the browser
+#    NOTE: This is the first gate — if this fails on BrowserStack,
+#    the platform cannot handle native-to-web context switches.
+- assertVisible:
+    text: "Wikipedia"
+
+# 5. Tap the search bar on Wikipedia mobile
+- tapOn:
+    text: "Search Wikipedia"
+
+# 6. Type a search query
+- inputText: "Android"
+
+# 7. Tap a search result (Wikipedia autocomplete shows "Android" as top suggestion)
+- tapOn:
+    text: "Android"
+
+# 8. Assert we landed on the Android article
+- assertVisible:
+    text: "Android"
