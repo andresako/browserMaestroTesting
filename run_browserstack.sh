@@ -224,7 +224,7 @@ echo -e "${BOLD}═════════════════════�
 if [[ "${FINAL_STATUS}" == "passed" ]]; then
     echo -e "${GREEN}${BOLD}✅  Build PASSED${RESET}"
 else
-    echo -e "${RED}${BOLD}❌  Build ${FINAL_STATUS^^}${RESET}"
+    echo -e "${RED}${BOLD}❌  Build $(echo "${FINAL_STATUS}" | tr '[:lower:]' '[:upper:]')${RESET}"
 fi
 
 echo -e "${BOLD}Build ID:  ${RESET}${BUILD_ID}"
