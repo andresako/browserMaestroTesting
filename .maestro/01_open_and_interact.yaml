@@ -1,0 +1,21 @@
+appId: com.example.browsermaestrotesting
+---
+- launchApp:
+    clearState: true
+
+- tapOn:
+    text: "Open external web"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    text: "Wikipedia"
+
+- scrollUntilVisible:
+    element:
+      text: "Terms of Use"
+- tapOn: "Terms of Use"
+
+- assertVisible:
+    text: "Wikimedia Foundation Terms of Use"

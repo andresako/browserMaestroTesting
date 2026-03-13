@@ -43,7 +43,7 @@ VERBOSE="${VERBOSE:-false}"
 POLL_INTERVAL=15  # seconds between status checks
 
 # Flows to execute (paths relative to the parent folder inside the zip)
-EXECUTE_FLOWS=("01_launch_app.yaml" "02_open_and_interact.yaml")
+EXECUTE_FLOWS=("01_open_and_interact.yaml")
 
 # ── Pre-flight checks ─────────────────────────────────────────────────────────
 echo ""

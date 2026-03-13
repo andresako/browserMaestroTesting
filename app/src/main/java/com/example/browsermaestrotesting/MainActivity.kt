@@ -1,7 +1,6 @@
 package com.example.browsermaestrotesting
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +49,10 @@ fun MainScreen() {
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wikipedia.org"))
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    "https://wikipedia.com".toUri()
+                )
                 try {
                     context.startActivity(intent)
                 } catch (e: android.content.ActivityNotFoundException) {
@@ -58,7 +61,7 @@ fun MainScreen() {
             },
             modifier = Modifier.testTag("open_browser_btn")
         ) {
-            Text("Open Wikipedia")
+            Text("Open external web")
         }
     }
 }
